@@ -1,12 +1,20 @@
+# filepath: d:\Flask-image\backend\main.py
 from flask import Flask, request
 from werkzeug.utils import secure_filename
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS  # Import CORS
 import os
 
 app = Flask(__name__)
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
+db = SQLAlchemy(app)
+CORS(app)  # Enable CORS for all routes
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-# Ensure upload folder exists
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+class UserInfo(db.Models):
+    id = db.column
+
 
 @app.route("/savedata", methods=["POST"])
 def save_data():
