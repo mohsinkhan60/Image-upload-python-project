@@ -49,19 +49,42 @@ const Home = () => {
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const newErrors = {};
+  if (!formData.name.trim()) newErrors.name = "Name is required.";
+  if (!formData.phone.trim()) newErrors.phone = "Phone number is required.";
+  if (!image) newErrors.image = "Image is required.";
 
-    // Form submission logic would go here
-    console.log("Form submitted:", { ...formData, image });
-    alert("Form submitted successfully!");
+  if (Object.keys(newErrors).length > 0) {
+    setErrors(newErrors);
+    return;
+  }
+
+  const data = new FormData();
+  data.append("name", formData.name);
+  data.append("phone", formData.phone);
+  data.append("image", image);
+
+  try {
+    const res = await fetch("http://localhost:5000/savedata", {
+      method: "POST",
+      body: data,
+    });
+
+    const result = await res.text();
+    alert(result);
 
     // Reset form
     setFormData({ name: "", phone: "" });
     setImage(null);
     setPreview(null);
-  };
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    alert("Failed to submit form.");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-100 flex items-center justify-center p-4">
@@ -131,6 +154,7 @@ const Home = () => {
               ref={fileInputRef}
               onChange={handleImageChange}
               accept="image/*"
+              name="image"
               className="hidden"
             />
 
