@@ -30,6 +30,7 @@
 <body>
    <h1>User Information</h1>
    {% if users %}
+       <p>Users found: {{ users|length }}</p> <!-- Debug: Show the number of users -->
        <table>
            <thead>
                <tr>

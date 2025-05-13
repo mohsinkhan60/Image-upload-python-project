@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, url_for
 from werkzeug.utils import secure_filename
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS  # Import CORS
@@ -10,12 +10,14 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False  # Disable unnecessary warn
 db = SQLAlchemy(app)
 CORS(app)  # Enable CORS for all routes
 
-app.config['UPLOAD_FOLDER'] = 'uploads'
+# Configure the upload folder
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-class UserInfo(db.Model):  # Corrected from db.Models to db.Model
+# Define the UserInfo model
+class UserInfo(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # Primary key
     name = db.Column(db.String(100), nullable=False)  # Full name
     phone = db.Column(db.String(15), nullable=False)  # Phone number
@@ -24,15 +26,18 @@ class UserInfo(db.Model):  # Corrected from db.Models to db.Model
     def __repr__(self):
         return f"<UserInfo {self.name}>"
 
+# Route to render the form
 @app.route("/", methods=["GET"])
 def home():
     return render_template("form.html")  # Render the form.html template
 
+# Route to display user information
 @app.route("/show", methods=["GET"])
 def show_users():
     users = UserInfo.query.all()  # Retrieve all users from the database
     return render_template("show.html", users=users)
 
+# Route to handle form submission and save data
 @app.route("/savedata", methods=["POST"])
 def save_data():
     full_name = request.form.get("name")
@@ -52,8 +57,9 @@ def save_data():
     db.session.add(user)
     db.session.commit()
 
-    return render_template("show.html")
+    return redirect(url_for("show_users"))  # Redirect to the show_users route
 
+# Main entry point
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()  # Create the database tables
