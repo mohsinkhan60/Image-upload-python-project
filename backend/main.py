@@ -12,8 +12,14 @@ CORS(app)  # Enable CORS for all routes
 
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-class UserInfo(db.Models):
-    id = db.column
+class UserInfo(db.Model):  # Corrected from db.Models to db.Model
+    id = db.Column(db.Integer, primary_key=True)  # Primary key
+    name = db.Column(db.String(100), nullable=False)  # Full name
+    phone = db.Column(db.String(15), nullable=False)  # Phone number
+    image_filename = db.Column(db.String(200), nullable=False)  # Image file name
+
+    def __repr__(self):
+        return f"<UserInfo {self.name}>"
 
 
 @app.route("/savedata", methods=["POST"])
